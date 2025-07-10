@@ -1,4 +1,3 @@
-// src/components/SourceInput.tsx
 "use client";
 
 import { useState } from 'react';
@@ -10,6 +9,9 @@ import { Loader2, Upload, Globe, Play, FileText, CheckCircle } from "lucide-reac
 interface SourceInputProps {
   onProcessingSuccess: (sessionId: string) => void;
 }
+
+// Get the API URL from environment variables
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
   const [activeTab, setActiveTab] = useState("pdf");
@@ -26,10 +28,11 @@ export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
   };
   
   const getApiEndpoint = () => {
+    if (!API_URL) return null;
     switch (activeTab) {
-      case "pdf": return "http://localhost:8000/process-pdf";
-      case "url": return "http://localhost:8000/process-url";
-      case "youtube": return "http://localhost:8000/process-youtube";
+      case "pdf": return `${API_URL}/process-pdf`;
+      case "url": return `${API_URL}/process-url`;
+      case "youtube": return `${API_URL}/process-youtube`;
       default: return null;
     }
   };
@@ -57,7 +60,10 @@ export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
   const handleSubmit = async () => {
     const endpoint = getApiEndpoint();
     const body = getRequestBody();
-    if (!endpoint || !body) return;
+    if (!endpoint || !body) {
+        setError("API endpoint is not configured correctly.");
+        return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -75,8 +81,12 @@ export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
       } else {
         throw new Error(data.message || "An unknown error occurred.");
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError("An unexpected error occurred.");
+        }
     } finally {
       setIsLoading(false);
     }

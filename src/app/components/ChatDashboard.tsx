@@ -1,7 +1,6 @@
-// src/components/ChatDashboard.tsx
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,8 +10,6 @@ import {
   FileText,
   HelpCircle,
   Loader2,
-  CheckCircle,
-  XCircle,
   BookOpen,
   Brain,
   Target,
@@ -23,8 +20,7 @@ import {
 
 interface ChatDashboardProps {
   sessionId: string;
-  onReset: () => void; // Optional prop to reset the session from parent component
-
+  onReset: () => void;
 }
 
 interface Message {
@@ -48,10 +44,10 @@ interface QuizState {
   score: number;
 }
 
-export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps) {
+// Get the API URL from environment variables
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-//   const [activeTab, setActiveTab] = useState("chat");
-//   const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps) {
   const [activeTab, setActiveTab] = useState("chat");
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -79,7 +75,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!currentMessage.trim()) return;
+    if (!currentMessage.trim() || !API_URL) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -93,7 +89,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +108,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (err) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -125,10 +121,11 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
     }
   };
 
-  const generateSummary = async () => {
+  const generateSummary = useCallback(async () => {
+    if (!API_URL) return;
     setIsGeneratingSummary(true);
     try {
-      const response = await fetch('http://localhost:8000/generate-summary', {
+      const response = await fetch(`${API_URL}/generate-summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId })
@@ -143,12 +140,13 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
     } finally {
       setIsGeneratingSummary(false);
     }
-  };
+  }, [sessionId]);
 
   const generateQuiz = async () => {
+    if (!API_URL) return;
     setIsGeneratingQuiz(true);
     try {
-      const response = await fetch('http://localhost:8000/generate-quiz', {
+      const response = await fetch(`${API_URL}/generate-quiz`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId })
@@ -174,7 +172,6 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
 
   const handleQuizAnswer = (answer: string) => {
     const newAnswers = [...quizState.userAnswers, answer];
-    const currentQ = quizState.questions[quizState.currentQuestion];
 
     if (quizState.currentQuestion < quizState.questions.length - 1) {
       setQuizState(prev => ({
@@ -210,7 +207,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
   useEffect(() => {
     // Auto-generate summary when component mounts
     generateSummary();
-  }, []);
+  }, [generateSummary]);
 
   return (
     <div className="w-full max-w-7xl mx-auto">

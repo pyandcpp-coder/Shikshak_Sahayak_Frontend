@@ -1,12 +1,15 @@
-// src/components/FileUpload.tsx
+// --- FIXED: src/app/components/FileUpload.tsx ---
+
 "use client";
 
 import { useState } from 'react';
 
-// Define the props that this component will accept
 interface FileUploadProps {
   onUploadSuccess: (sessionId: string) => void;
 }
+
+// Get the API URL from environment variables
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
@@ -24,6 +27,10 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       setError("Please select a file first.");
       return;
     }
+    if (!API_URL) {
+        setError("API endpoint is not configured correctly.");
+        return;
+    }
 
     setUploading(true);
     setError(null);
@@ -32,7 +39,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8000/process-pdf', {
+      const response = await fetch(`${API_URL}/process-pdf`, {
         method: 'POST',
         body: formData,
       });
@@ -44,13 +51,16 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       const data = await response.json();
 
       if (data.status === 'success') {
-        // This is the key change: Call the function passed from the parent component
         onUploadSuccess(data.session_id);
       } else {
         throw new Error(data.message || 'An error occurred during processing.');
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError("An unexpected error occurred.");
+        }
     } finally {
       setUploading(false);
     }
@@ -81,7 +91,6 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         {uploading ? 'Processing...' : 'Start Learning'}
       </button>
 
-      {/* The success message is removed as the parent will handle the UI change */}
       {error && <div className="p-3 mt-4 text-red-800 bg-red-100 border border-red-200 rounded-lg">Error: {error}</div>}
     </div>
   );
