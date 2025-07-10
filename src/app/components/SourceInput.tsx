@@ -54,7 +54,7 @@ export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
     }
   };
   
-  const getRequestHeaders = () => {
+  const getRequestHeaders = (): Record<string, string> => {
       if (activeTab === 'pdf') return {}; // FormData sets its own content-type
       return { 'Content-Type': 'application/json' };
   }
