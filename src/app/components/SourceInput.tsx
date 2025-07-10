@@ -1,4 +1,4 @@
-// --- FIXED (v2): src/app/components/SourceInput.tsx ---
+// --- FIXED (v3): src/app/components/SourceInput.tsx ---
 
 "use client";
 
@@ -113,7 +113,7 @@ export default function SourceInput({ onProcessingSuccess }: SourceInputProps) {
             Choose Your Learning Source
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Select the type of content you'd like to learn from
+            Select the type of content you&apos;d like to learn from
           </p>
         </div>
 

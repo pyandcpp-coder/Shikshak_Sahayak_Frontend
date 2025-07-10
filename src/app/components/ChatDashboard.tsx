@@ -1,4 +1,4 @@
-// --- FIXED (v2): src/app/components/ChatDashboard.tsx ---
+// --- FIXED (v3): src/app/components/ChatDashboard.tsx ---
 
 "use client";
 
@@ -110,7 +110,8 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (_err) { // FIXED: err changed to _err as it's not used
+    } catch (error) {
+      console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -271,7 +272,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
                       Start Your Learning Journey
                     </h3>
                     <p className="text-gray-500 dark:text-gray-400">
-                      Ask me anything about your content. I'm here to help you learn!
+                      Ask me anything about your content. I&apos;m here to help you learn!
                     </p>
                   </div>
                 ) : (
@@ -372,7 +373,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
                 ) : (
                   <div className="text-center py-12">
                     <Lightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-300">Click "Regenerate" to create a summary</p>
+                    <p className="text-gray-600 dark:text-gray-300">Click &ldquo;Regenerate&rdquo; to create a summary</p>
                   </div>
                 )}
               </div>
@@ -426,7 +427,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
                 ) : quizState.questions.length === 0 ? (
                   <div className="text-center py-12">
                     <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-300">Click "Generate Quiz" to create questions</p>
+                    <p className="text-gray-600 dark:text-gray-300">Click &ldquo;Generate Quiz&rdquo; to create questions</p>
                   </div>
                 ) : quizState.showResults ? (
                   <div className="text-center space-y-6">
