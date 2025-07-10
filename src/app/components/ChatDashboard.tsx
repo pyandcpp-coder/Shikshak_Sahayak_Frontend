@@ -1,3 +1,5 @@
+// --- FIXED (v2): src/app/components/ChatDashboard.tsx ---
+
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -108,7 +110,7 @@ export default function ChatDashboard({ sessionId, onReset }: ChatDashboardProps
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (err) {
+    } catch (_err) { // FIXED: err changed to _err as it's not used
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',

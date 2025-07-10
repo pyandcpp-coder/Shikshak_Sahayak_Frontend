@@ -1,3 +1,5 @@
+// --- FIXED (v2): src/app/components/SourceInput.tsx ---
+
 "use client";
 
 import { useState } from 'react';
