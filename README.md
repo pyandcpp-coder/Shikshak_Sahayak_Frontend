@@ -38,7 +38,7 @@ This project was built with a modern, responsive interface using Next.js and sha
 
 ## 🚀 Getting Started
 
-To run this project locally, you will need to have the [Shiksha Sahayak Backend](https://github.com/pyandcpp-coder/shiksha-sahayak-backend) running as well.
+To run this project locally, you will need to have the [Shiksha Sahayak Backend](https://github.com/pyandcpp-coder/Shikshak_Sahayak_Backend) running as well.
 
 ### Prerequisites
 
